@@ -5,6 +5,14 @@ import styled from "styled-components"
 import Grid from "../components/grid"
 import wordsMap from "../data/words_dictionary"
 
+
+const Header = styled.div`
+font-size: 40px;
+color: coral;
+width: 100vw;
+text-align: center;
+`
+
 export default function Home() {
   const [matrix, setMatrix] = useState([])
   const [isSelected, setIsSelected] = useState([
@@ -14,7 +22,23 @@ export default function Home() {
     [0, 0, 0, 0],
   ])
   const [currentWord, setCurrentWord] = useState("")
+  const [timer, setTimer] = useState(60)
   const [score, setScore] = useState(0)
+  const [isMousePressed, setIsMousePressed] = useState(false);
+  const [words, setWords] = useState([])
+
+  useEffect(() => {
+    global.tickTock = setInterval(() => {
+      setTimer(prev => prev - 1)
+    }, 1000);
+  }, [])
+
+  useEffect(() => {
+    if (timer == 0) {
+      clearInterval(global.tickTock)
+      // can trigger some game logic here
+    }
+  }, [timer])
 
   const selectEvent = (hitRow, hitCol) => {
     setIsSelected(prevState => {
@@ -47,21 +71,21 @@ export default function Home() {
     setMatrix(generateRandom2DArray(rows, cols));
   }, [])
 
-  const [isMousePressed, setIsMousePressed] = useState(false);
+  useEffect(() => {
+    if (!isMousePressed && currentWord.length > 2) {
+      if (wordsMap[currentWord.toLowerCase()] == 1 && !words.includes(currentWord)) {
+        setScore(prev => prev + (currentWord.length * 100))
+        setWords(prev => [...prev, currentWord])
+      }
+    }
+    setIsSelected([[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]])
+    setCurrentWord("")
+  }, [isMousePressed])
+
+  const handleGlobalMouseDown = () => setIsMousePressed(true);
+  const handleGlobalMouseUp = () => setIsMousePressed(false);
 
   useEffect(() => {
-    const handleGlobalMouseDown = () => setIsMousePressed(true);
-    const handleGlobalMouseUp = () => {
-      setIsMousePressed(false);
-      setCurrentWord((prevWord) => {
-        if (wordsMap[prevWord.toLowerCase()] == 1) {
-          setScore(prev => prev + (prevWord.length * 50));
-        }
-        return "";
-      });
-      setIsSelected([[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]);
-    };
-
     window.addEventListener("mousedown", handleGlobalMouseDown);
     window.addEventListener("mouseup", handleGlobalMouseUp);
 
@@ -73,8 +97,11 @@ export default function Home() {
 
   return (
     <>
-      <p>Current Word: {currentWord}</p>
-      <p>Score: {score}</p>
+      <Header>
+        <p>Current Word: {currentWord}</p>
+        <p>Score: {score}</p>
+        <p>{timer}</p>
+      </Header>
       <Grid letters={matrix} isSelected={isSelected} selectEvent={selectEvent} isMousePressed={isMousePressed} />
     </>
   )
