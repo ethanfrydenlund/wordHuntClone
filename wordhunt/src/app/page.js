@@ -52,15 +52,15 @@ export default function Home() {
   useEffect(() => {
     const handleGlobalMouseDown = () => setIsMousePressed(true);
     const handleGlobalMouseUp = () => {
-      setIsMousePressed(false)
-      const isValid = isEnglishWord()
-      if (isValid) {
-        setScore(prev => prev + (currentWord.length * 100))
-      }
-      // do some analysis function
-      setIsSelected(() => [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]])
-      setCurrentWord(() => "")
-    }
+      setIsMousePressed(false);
+      setCurrentWord((prevWord) => {
+        if (wordsMap[prevWord.toLowerCase()] == 1) {
+          setScore(prev => prev + (prevWord.length * 50));
+        }
+        return "";
+      });
+      setIsSelected([[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]);
+    };
 
     window.addEventListener("mousedown", handleGlobalMouseDown);
     window.addEventListener("mouseup", handleGlobalMouseUp);
@@ -71,14 +71,8 @@ export default function Home() {
     }
   }, [])
 
-
-  const isEnglishWord = () => {
-    return wordsMap[currentWord.toLowerCase()] == 1
-  }
-
   return (
     <>
-
       <p>Current Word: {currentWord}</p>
       <p>Score: {score}</p>
       <Grid letters={matrix} isSelected={isSelected} selectEvent={selectEvent} isMousePressed={isMousePressed} />
