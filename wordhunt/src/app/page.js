@@ -1,95 +1,87 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import React, { useState, useEffect, useMemo } from 'react';
+import styled from "styled-components"
+import Grid from "../components/grid"
+import wordsMap from "../data/words_dictionary"
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [matrix, setMatrix] = useState([])
+  const [isSelected, setIsSelected] = useState([
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+  ])
+  const [currentWord, setCurrentWord] = useState("")
+  const [score, setScore] = useState(0)
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+  const selectEvent = (hitRow, hitCol) => {
+    setIsSelected(prevState => {
+      return prevState.map((row, rIdx) =>
+        row.map((col, cIdx) =>
+          (rIdx === hitRow && cIdx === hitCol) ? 1 : col
+        )
+      )
+    })
+    setCurrentWord(prev => prev + matrix[hitRow][hitCol])
+  }
+
+  const generateRandom2DArray = (rows, cols) => {
+    const newArray = [];
+    for (let i = 0; i < rows; i++) {
+      const row = [];
+      for (let j = 0; j < cols; j++) {
+        row.push(Math.floor(Math.random() * 26));
+      }
+      newArray.push(row);
+    }
+
+    newArray.forEach((row, rowIndex) => row.forEach((elm, colIndex) => newArray[rowIndex][colIndex] = String.fromCharCode(elm + 65)))
+    return newArray;
+  }
+
+  useEffect(() => {
+    const rows = 4;
+    const cols = 4;
+    setMatrix(generateRandom2DArray(rows, cols));
+  }, [])
+
+  const [isMousePressed, setIsMousePressed] = useState(false);
+
+  useEffect(() => {
+    const handleGlobalMouseDown = () => setIsMousePressed(true);
+    const handleGlobalMouseUp = () => {
+      setIsMousePressed(false)
+      const isValid = isEnglishWord()
+      if (isValid) {
+        setScore(prev => prev + (currentWord.length * 100))
+      }
+      // do some analysis function
+      setIsSelected(() => [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]])
+      setCurrentWord(() => "")
+    }
+
+    window.addEventListener("mousedown", handleGlobalMouseDown);
+    window.addEventListener("mouseup", handleGlobalMouseUp);
+
+    return () => {
+      window.removeEventListener("mousedown", handleGlobalMouseDown);
+      window.removeEventListener("mouseup", handleGlobalMouseUp);
+    }
+  }, [])
+
+
+  const isEnglishWord = () => {
+    return wordsMap[currentWord.toLowerCase()] == 1
+  }
+
+  return (
+    <>
+
+      <p>Current Word: {currentWord}</p>
+      <p>Score: {score}</p>
+      <Grid letters={matrix} isSelected={isSelected} selectEvent={selectEvent} isMousePressed={isMousePressed} />
+    </>
+  )
 }
