@@ -5,12 +5,38 @@ import styled from "styled-components"
 import Grid from "../components/grid"
 import wordsMap from "../data/words_dictionary"
 
+const Container = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+`
+const TopSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 40vw;
+`
+const FirstRow = styled.div`
+  display: flex;
+`
 
-const Header = styled.div`
+const Scoreboard = styled.div`
   display: flex;
   font-size: 40px;
   color: coral;
-  width: 40vw;
+  align-items: center;
+`
+const Timer = styled.div`
+  text-align: right;
+  margin-right: 10px;
+`
+
+const Score = styled.div`
+  text-align: left;
+`
+const Word = styled.div`
   text-align: center;
 `
 
@@ -26,6 +52,8 @@ const PlayButton = styled.div`
   padding: 5px;
   border-radius: 8px;
   cursor: pointer;
+  margin-right: 20px;
+  text-align: center;
 `
 
 export default function Home() {
@@ -114,13 +142,18 @@ export default function Home() {
   }, [])
 
   return (
-    <>
-      <Header>
-        <p>Current Word: {currentWord}</p>
-        <p>{timer}  Score: {score}</p>
-        <PlayButton>Play</PlayButton>
-      </Header>
+    <Container>
+      <TopSection>
+        <FirstRow>
+          <PlayButton>Play</PlayButton>
+          <Scoreboard>
+            <Timer>{timer}</Timer>
+            <Score>{score}</Score>
+          </Scoreboard>
+        </FirstRow>
+        <Word>{currentWord}</Word>
+      </TopSection>
       <Grid letters={matrix} isSelected={isSelected} selectEvent={selectEvent} isMousePressed={isMousePressed} lastCoords={lastCoords} />
-    </>
+    </Container>
   )
 }
