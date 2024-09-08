@@ -60,10 +60,10 @@ const Item2 = styled(BaseItem)`
   }
 `;
 
-const grid = ({ letters, selectEvent, isSelected, isMousePressed, lastCoords }) => {
+const grid = ({ letters, selectEvent, isSelected, isMousePressed, lastCoords, gameState }) => {
 
   const validateEvent = (rowIndex, colIndex) => {
-    if (isMousePressed && isSelected[rowIndex][colIndex] == 0 && validateCoords(rowIndex, colIndex)) {
+    if (gameState && isMousePressed && isSelected[rowIndex][colIndex] == 0 && validateCoords(rowIndex, colIndex)) {
       selectEvent(rowIndex, colIndex)
     }
   }

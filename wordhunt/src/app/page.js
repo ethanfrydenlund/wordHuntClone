@@ -18,6 +18,7 @@ const TopSection = styled.div`
   margin-top: 5vh;
   flex-direction: column;
   width: 40vw;
+  user-select: none;
 `
 const FirstRow = styled.div`
   display: flex;
@@ -87,7 +88,7 @@ export default function Home() {
     [0, 0, 0, 0],
   ])
   const [currentWord, setCurrentWord] = useState("")
-  const [gameState, setGaneState] = useState(false)
+  const [gameState, setGameState] = useState(false)
   const [timer, setTimer] = useState(60)
   const [score, setScore] = useState(0)
   const [isMousePressed, setIsMousePressed] = useState(false)
@@ -107,6 +108,11 @@ export default function Home() {
   useEffect(() => {
     if (timer == 0) {
       stopTimer()
+      setGameState(false)
+
+      setIsMousePressed(false)
+      setIsSelected([[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]])
+      setCurrentWord("")
       // can trigger some game logic here
     }
   }, [timer])
@@ -149,8 +155,8 @@ export default function Home() {
     setLastCoords([])
   }, [isMousePressed])
 
-  const handleGlobalMouseDown = () => setIsMousePressed(true);
-  const handleGlobalMouseUp = () => setIsMousePressed(false);
+  const handleGlobalMouseDown = () => setIsMousePressed(true)
+  const handleGlobalMouseUp = () => setIsMousePressed(false)
 
   useEffect(() => {
     window.addEventListener("mousedown", handleGlobalMouseDown);
@@ -163,22 +169,21 @@ export default function Home() {
     }
   }, [])
 
-  useEffect(() => {
-    if (gameState) {
-      setMatrix(generateRandom2DArray(4, 4))
-      stopTimer()
-      startTimer()
-      setWords(() => [])
-      setScore(() => 0)
-      setTimer(() => 60)
-    }
-  }, [gameState])
+  const updateGameState = () => {
+    setGameState(true)
+    setMatrix(generateRandom2DArray(4, 4))
+    stopTimer()
+    startTimer()
+    setWords(() => [])
+    setScore(() => 0)
+    setTimer(() => 60)
+  }
 
   return (
     <Container>
       <TopSection>
         <FirstRow>
-          <PlayButton onClick={() => setGameState(true)}>Play</PlayButton>
+          <PlayButton onClick={() => updateGameState()}>Play</PlayButton>
           <Scoreboard>
             <Timer>⏰ {timer}</Timer>
             <Score>🪙 {score}</Score>
@@ -186,7 +191,7 @@ export default function Home() {
         </FirstRow>
         <Word>{currentWord}</Word>
       </TopSection>
-      <Grid letters={matrix} isSelected={isSelected} selectEvent={selectEvent} isMousePressed={isMousePressed} lastCoords={lastCoords} />
+      <Grid letters={matrix} isSelected={isSelected} selectEvent={selectEvent} isMousePressed={isMousePressed} lastCoords={lastCoords} gameState={gameState} />
     </Container>
   )
 }
