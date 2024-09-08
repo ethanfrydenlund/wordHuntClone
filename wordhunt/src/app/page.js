@@ -7,10 +7,25 @@ import wordsMap from "../data/words_dictionary"
 
 
 const Header = styled.div`
-font-size: 40px;
-color: coral;
-width: 100vw;
-text-align: center;
+  display: flex;
+  font-size: 40px;
+  color: coral;
+  width: 40vw;
+  text-align: center;
+`
+
+const PlayButton = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  background: coral;
+  color: black;
+  width: 5vw;
+  height: 5vw;
+  padding: 5px;
+  border-radius: 8px;
+  cursor: pointer;
 `
 
 export default function Home() {
@@ -24,8 +39,9 @@ export default function Home() {
   const [currentWord, setCurrentWord] = useState("")
   const [timer, setTimer] = useState(60)
   const [score, setScore] = useState(0)
-  const [isMousePressed, setIsMousePressed] = useState(false);
+  const [isMousePressed, setIsMousePressed] = useState(false)
   const [words, setWords] = useState([])
+  const [lastCoords, setLastCoords] = useState([])
 
   useEffect(() => {
     global.tickTock = setInterval(() => {
@@ -41,6 +57,7 @@ export default function Home() {
   }, [timer])
 
   const selectEvent = (hitRow, hitCol) => {
+    setLastCoords(() => [hitRow, hitCol])
     setIsSelected(prevState => {
       return prevState.map((row, rIdx) =>
         row.map((col, cIdx) =>
@@ -80,6 +97,7 @@ export default function Home() {
     }
     setIsSelected([[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]])
     setCurrentWord("")
+    setLastCoords([])
   }, [isMousePressed])
 
   const handleGlobalMouseDown = () => setIsMousePressed(true);
@@ -99,10 +117,10 @@ export default function Home() {
     <>
       <Header>
         <p>Current Word: {currentWord}</p>
-        <p>Score: {score}</p>
-        <p>{timer}</p>
+        <p>{timer}  Score: {score}</p>
+        <PlayButton>Play</PlayButton>
       </Header>
-      <Grid letters={matrix} isSelected={isSelected} selectEvent={selectEvent} isMousePressed={isMousePressed} />
+      <Grid letters={matrix} isSelected={isSelected} selectEvent={selectEvent} isMousePressed={isMousePressed} lastCoords={lastCoords} />
     </>
   )
 }

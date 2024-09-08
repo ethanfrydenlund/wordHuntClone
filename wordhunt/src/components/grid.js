@@ -29,6 +29,7 @@ const BaseItem = styled.div`
   width: 10vh;
   height: 10vh;
   background-color: #f0f0f0;
+  border: 2px solid #f0f0f0;
   text-align: center;
   border-radius: 8px;
   justify-content: center;
@@ -40,22 +41,41 @@ const BaseItem = styled.div`
 
 const Item1 = styled(BaseItem)`
   &:hover {
-    background-color: coral;
-    scale: 120%;
+    border: 2px dashed coral;
   }
 `;
 
 const Item2 = styled(BaseItem)`
-  background-color: coral;
-  scale: 120%;
+  background: coral;
+  transform: scale(1); 
+  animation: scaleUp 0.25s ease-out forwards;
+
+  @keyframes scaleUp {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(1.1);
+    }
+  }
 `;
 
-const grid = ({ letters, selectEvent, isSelected, isMousePressed }) => {
+const grid = ({ letters, selectEvent, isSelected, isMousePressed, lastCoords }) => {
 
   const validateEvent = (rowIndex, colIndex) => {
-    if (isMousePressed && isSelected[rowIndex][colIndex] == 0) {
+    if (isMousePressed && isSelected[rowIndex][colIndex] == 0 && validateCoords(rowIndex, colIndex)) {
       selectEvent(rowIndex, colIndex)
     }
+  }
+
+  const validateCoords = (rowIndex, colIndex) => {
+    if (lastCoords.length == 0) {
+      return true
+    }
+    if (Math.abs(lastCoords[0] - rowIndex) <= 1 && Math.abs(lastCoords[1] - colIndex) <= 1) {
+      return true
+    }
+    return false
   }
 
   return (
