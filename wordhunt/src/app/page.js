@@ -61,11 +61,17 @@ const PlayButton = styled.div`
   border-radius: 8px;
   cursor: pointer;
   text-align: center;
+  transition: transform 0.25s ease;
 
-   &:hover {
-    background-color: lightcoral;
+  &:hover {
+    background-color: lightgray;
   }
-`
+
+  &:active {
+    background-color: gray;
+    transform: scale(0.9);
+  }
+`;
 
 export default function Home() {
   const [matrix, setMatrix] = useState([
@@ -81,6 +87,7 @@ export default function Home() {
     [0, 0, 0, 0],
   ])
   const [currentWord, setCurrentWord] = useState("")
+  const [gameState, setGaneState] = useState(false)
   const [timer, setTimer] = useState(60)
   const [score, setScore] = useState(0)
   const [isMousePressed, setIsMousePressed] = useState(false)
@@ -93,9 +100,13 @@ export default function Home() {
     }, 1000);
   };
 
+  const stopTimer = () => {
+    clearInterval(global.tickTock)
+  }
+
   useEffect(() => {
     if (timer == 0) {
-      clearInterval(global.tickTock)
+      stopTimer()
       // can trigger some game logic here
     }
   }, [timer])
@@ -148,19 +159,26 @@ export default function Home() {
     return () => {
       window.removeEventListener("mousedown", handleGlobalMouseDown);
       window.removeEventListener("mouseup", handleGlobalMouseUp);
+      stopTimer()
     }
   }, [])
 
-  const startGame = () => {
-    setMatrix(generateRandom2DArray(4, 4))
-    startTimer()
-  }
+  useEffect(() => {
+    if (gameState) {
+      setMatrix(generateRandom2DArray(4, 4))
+      stopTimer()
+      startTimer()
+      setWords(() => [])
+      setScore(() => 0)
+      setTimer(() => 60)
+    }
+  }, [gameState])
 
   return (
     <Container>
       <TopSection>
         <FirstRow>
-          <PlayButton onClick={() => startGame()}>Play</PlayButton>
+          <PlayButton onClick={() => setGameState(true)}>Play</PlayButton>
           <Scoreboard>
             <Timer>⏰ {timer}</Timer>
             <Score>🪙 {score}</Score>
