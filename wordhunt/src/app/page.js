@@ -15,49 +15,65 @@ const Container = styled.div`
 `
 const TopSection = styled.div`
   display: flex;
+  margin-top: 5vh;
   flex-direction: column;
   width: 40vw;
 `
 const FirstRow = styled.div`
   display: flex;
 `
-
 const Scoreboard = styled.div`
   display: flex;
-  font-size: 40px;
-  color: coral;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 50%);
   align-items: center;
 `
 const Timer = styled.div`
   text-align: right;
-  margin-right: 10px;
+  font-size: 40px;
+  font-weight: 500;
+  margin-right: 30px;
 `
-
 const Score = styled.div`
   text-align: left;
+  font-size: 40px;
+  font-weight: 500;
+  color: gold;
 `
 const Word = styled.div`
   text-align: center;
+  color: coral;
+  font-size: 40px;  
+  height: 3vh;
+  margin-top: 5vh;
 `
-
 const PlayButton = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 30px;
-  background: coral;
+  background-color: #f0f0f0;
   color: black;
   width: 5vw;
   height: 5vw;
   padding: 5px;
   border-radius: 8px;
   cursor: pointer;
-  margin-right: 20px;
   text-align: center;
+
+   &:hover {
+    background-color: lightcoral;
+  }
 `
 
 export default function Home() {
-  const [matrix, setMatrix] = useState([])
+  const [matrix, setMatrix] = useState([
+    ['?', '?', '?', '?'],
+    ['?', '?', '?', '?'],
+    ['?', '?', '?', '?'],
+    ['?', '?', '?', '?']
+  ])
   const [isSelected, setIsSelected] = useState([
     [0, 0, 0, 0],
     [0, 0, 0, 0],
@@ -71,11 +87,11 @@ export default function Home() {
   const [words, setWords] = useState([])
   const [lastCoords, setLastCoords] = useState([])
 
-  useEffect(() => {
+  const startTimer = () => {
     global.tickTock = setInterval(() => {
-      setTimer(prev => prev - 1)
+      setTimer(prev => prev - 1);
     }, 1000);
-  }, [])
+  };
 
   useEffect(() => {
     if (timer == 0) {
@@ -111,12 +127,6 @@ export default function Home() {
   }
 
   useEffect(() => {
-    const rows = 4;
-    const cols = 4;
-    setMatrix(generateRandom2DArray(rows, cols));
-  }, [])
-
-  useEffect(() => {
     if (!isMousePressed && currentWord.length > 2) {
       if (wordsMap[currentWord.toLowerCase()] == 1 && !words.includes(currentWord)) {
         setScore(prev => prev + (currentWord.length * 100))
@@ -141,14 +151,19 @@ export default function Home() {
     }
   }, [])
 
+  const startGame = () => {
+    setMatrix(generateRandom2DArray(4, 4))
+    startTimer()
+  }
+
   return (
     <Container>
       <TopSection>
         <FirstRow>
-          <PlayButton>Play</PlayButton>
+          <PlayButton onClick={() => startGame()}>Play</PlayButton>
           <Scoreboard>
-            <Timer>{timer}</Timer>
-            <Score>{score}</Score>
+            <Timer>⏰ {timer}</Timer>
+            <Score>🪙 {score}</Score>
           </Scoreboard>
         </FirstRow>
         <Word>{currentWord}</Word>
